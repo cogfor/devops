@@ -19,8 +19,8 @@ from fabric.contrib import django
 from fabric.decorators import with_settings
 
 
-env.user = 'wsgi'
-env.hosts = ['linkscreative.co.uk:22734']
+env.user = 'deploy'
+env.hosts = ['tealc']
 env.db_adapter = 'mysql'
 env.db_user = os.environ.get('DB_USER') or 'root'
 env.db_password = os.environ.get('DB_PASSWORD')
