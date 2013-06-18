@@ -26,6 +26,8 @@ env.db_password = os.environ.get('DB_PASSWORD')
 env.db_host = os.environ.get('DB_HOST') or 'localhost'
 env.virtualenv_template = u'/srv/{env.repo}/{env.instance}/.virtualenvs/{env.repo}_{env.instance}'
 CWD = sys.path[0]
+env.memcached = False
+env.celery = False
 
 
 def debug():
@@ -93,8 +95,8 @@ def generate_envvars():
         'DJANGO_DB_PASSWORD': env.secrets['db'],
         'DJANGO_SECRET_KEY': env.secrets['key'],
     }
-    
-    if env.memcached:
+
+    if hasattr(env, 'memcached'):
         variables['DJANGO_MC_SOCKET'] = env.memcached_sock
 
     env.envvars = variables
@@ -305,6 +307,6 @@ def celery(instance=None):
     else:
         loglevel = ''
     celery_cmd = 'DJANGO_SETTINGS_MODULE={env.app}.settings.celery_{env.settings_variant} {env.virtualenv}/bin/python manage.py celery worker -B {loglevel}'.format(env=env, loglevel=loglevel)
-    if env.celery_workers:
+    if hasattr(env, 'celery_workers'):
         celery_cmd += ' -c {env.celery_workers}'.format(env=env)
     local(celery_cmd)
