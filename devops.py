@@ -19,8 +19,7 @@ from fabric.contrib import django
 from fabric.decorators import with_settings
 
 
-env.user = 'deploy'
-env.hosts = ['tealc']
+env.hosts = []
 env.db_adapter = 'postgresql'
 env.db_user = os.environ.get('DB_USER') or 'root'
 env.db_password = os.environ.get('DB_PASSWORD')
@@ -52,6 +51,9 @@ def virtualenv():
 def init(instance):
     sys.path.insert(0, CWD)
     env.instance = instance
+    if not env.user:
+        env.user = u'{env.user}_{env.instance}'.format(env=env)
+
     if not env.repo:
         raise Exception('REPO not defined.')
     if not env.app:
