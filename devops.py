@@ -49,7 +49,7 @@ def virtualenv():
                 yield
 
 
-def _init(instance):
+def init(instance):
     sys.path.insert(0, CWD)
     env.instance = instance
     if not env.repo:
@@ -157,7 +157,7 @@ def setup_database():
 
 
 def initialise(instance):
-    _init(instance)
+    init(instance)
     if not confirm(red('Initialising a site will CHANGE THE DATABASE PASSWORD/SECRET KEY. Are you SURE you wish to continue?'), default=False):
         exit()
 
@@ -230,7 +230,7 @@ def initialise(instance):
     
 
 def upgrade(instance):
-    _init(instance)
+    init(instance)
 
     print(u'Updating {instance}'.format(instance=instance)) 
 
@@ -250,7 +250,7 @@ def upgrade(instance):
         restart()
 
 def shell(instance, *args, **kwargs):
-    _init(instance)
+    init(instance)
     manage('shell_plus')
 
 
@@ -286,7 +286,7 @@ def conf_uwsgi():
 
 def celery(instance=None):
     instance = instance or 'local'
-    _init(instance)
+    init(instance)
     if instance == 'local':
         loglevel = '--loglevel=INFO'
     else:
