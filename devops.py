@@ -69,6 +69,8 @@ def init(instance):
     env.activate = u'source {env.virtualenv}/bin/activate'.format(env=env)
     env.source_vars = u'source {env.virtualenv}/bin/vars'.format(env=env)
     env.uwsgi_ini = u'{env.directory}/uwsgi.ini'.format(env=env)
+    if env.memcached:
+        env.memcached_sock = '{env.directory}/memcached.sock'.format(env=env)
 
     if env.instance == 'live':
         env.settings_variant = 'production'
@@ -91,6 +93,10 @@ def generate_envvars():
         'DJANGO_DB_PASSWORD': env.secrets['db'],
         'DJANGO_SECRET_KEY': env.secrets['key'],
     }
+    
+    if env.memcached:
+        variables['DJANGO_MC_SOCKET'] = env.memcached_sock
+
     env.envvars = variables
     
 
@@ -227,6 +233,7 @@ def initialise(instance):
             'virtualenv': env.virtualenv,
             'instance': env.instance,
             'celery': env.celery,
+            'memcached': env.memcached,
         })
         conf_uwsgi()
         
