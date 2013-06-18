@@ -297,4 +297,4 @@ def celery(instance=None):
         loglevel = '--loglevel=INFO'
     else:
         loglevel = ''
-    local('DJANGO_SETTINGS_MODULE={env.app}.settings.celery_{env.settings_variant} python manage.py celery worker -B {loglevel}'.format(env=env, loglevel=loglevel))
+    local('DJANGO_SETTINGS_MODULE={env.app}.settings.celery_{env.settings_variant} {env.virtualenv}/bin/python manage.py celery worker -B {loglevel}'.format(env=env, loglevel=loglevel))
