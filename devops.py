@@ -236,6 +236,8 @@ def initialise(instance):
             'instance': env.instance,
             'celery': env.celery,
             'memcached': env.memcached,
+            'uwsgi_socket': '127.0.0.1:3031',
+            'fastrouter': True,
         })
         conf_uwsgi()
         
