@@ -51,8 +51,10 @@ def virtualenv():
 def init(instance):
     sys.path.insert(0, CWD)
     env.instance = instance
-    if not hasattr(env, 'user'):
+    if not hasattr(env, 'user_override'):
         env.user = u'{env.user}_{env.instance}'.format(env=env)
+    else:
+        env.user = env.user_override
 
     if not env.repo:
         raise Exception('REPO not defined.')
