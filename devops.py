@@ -226,6 +226,7 @@ def initialise(instance):
             'env': env.envvars,
             'virtualenv': env.virtualenv,
             'instance': env.instance,
+            'celery': env.celery,
         })
         conf_uwsgi()
         
