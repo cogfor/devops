@@ -21,11 +21,11 @@ from fabric.decorators import with_settings
 
 env.user = 'deploy'
 env.hosts = ['tealc']
-env.db_adapter = 'mysql'
+env.db_adapter = 'postgresql'
 env.db_user = os.environ.get('DB_USER') or 'root'
 env.db_password = os.environ.get('DB_PASSWORD')
 env.db_host = os.environ.get('DB_HOST') or 'localhost'
-
+env.virtualenv_template = u'/srv/{env.repo}/{env.instance}/.virtualenvs/{env.repo}_{env.instance}/'
 CWD = sys.path[0]
 
 
@@ -61,7 +61,7 @@ def _init(instance):
     if not env.project:
         raise Exception('PROJECT not defined.')
     env.directory = u'/srv/{env.repo}/{env.instance}'.format(env=env)
-    env.virtualenv = u'/env/{env.repo}/{env.instance}'.format(env=env)
+    env.virtualenv = env.virtualenv_template.format(env=env)
     env.activate = u'source {env.virtualenv}/bin/activate'.format(env=env)
     env.source_vars = u'source {env.virtualenv}/bin/vars'.format(env=env)
     env.uwsgi_ini = u'{env.directory}/uwsgi.ini'.format(env=env)
@@ -219,7 +219,8 @@ def initialise(instance):
             'type': 'uwsgi',
             'application': 'django',
             'app': env.app,
-            'env': env.envvars
+            'env': env.envvars,
+            'virtualenv': env.virtualenv_template,
         })
         conf_uwsgi()
         
