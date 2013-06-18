@@ -51,7 +51,7 @@ def virtualenv():
 def init(instance):
     sys.path.insert(0, CWD)
     env.instance = instance
-    if not env.user:
+    if not hasattr(env, 'user'):
         env.user = u'{env.user}_{env.instance}'.format(env=env)
 
     if not env.repo:
