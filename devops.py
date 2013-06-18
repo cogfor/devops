@@ -224,7 +224,7 @@ def initialise(instance):
             'application': 'django',
             'app': env.app,
             'env': env.envvars,
-            'virtualenv': env.virtualenv_template,
+            'virtualenv': env.virtualenv,
         })
         conf_uwsgi()
         
