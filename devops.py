@@ -174,7 +174,7 @@ def initialise(instance):
     generate_envvars()
     create_var_file()
     
-    if not exists(u'{env.virtualenv}/bin/activate'.format(env=env)):
+    if not exists(u'{env.virtualenv}/bin/vars'.format(env=env)):
         run(u'virtualenv {env.virtualenv}'.format(env=env))
         with virtualenv():
             run('pip install \'distribute>=0.6.35\'')
