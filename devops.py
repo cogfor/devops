@@ -19,14 +19,15 @@ from fabric.contrib import django
 from fabric.decorators import with_settings
 
 
-env.user = 'deploy'
-env.hosts = ['tealc']
-env.db_adapter = 'mysql'
+env.hosts = []
+env.db_adapter = 'postgresql'
 env.db_user = os.environ.get('DB_USER') or 'root'
 env.db_password = os.environ.get('DB_PASSWORD')
 env.db_host = os.environ.get('DB_HOST') or 'localhost'
-
+env.virtualenv_template = u'/srv/{env.repo}/{env.instance}/.virtualenvs/{env.repo}_{env.instance}'
 CWD = sys.path[0]
+env.memcached = False
+env.celery = False
 
 
 def debug():
@@ -49,9 +50,14 @@ def virtualenv():
                 yield
 
 
-def _init(instance):
+def init(instance):
     sys.path.insert(0, CWD)
     env.instance = instance
+    if not hasattr(env, 'user_override'):
+        env.user = u'{env.repo}_{env.instance}'.format(env=env)
+    else:
+        env.user = env.user_override
+
     if not env.repo:
         raise Exception('REPO not defined.')
     if not env.app:
@@ -61,10 +67,12 @@ def _init(instance):
     if not env.project:
         raise Exception('PROJECT not defined.')
     env.directory = u'/srv/{env.repo}/{env.instance}'.format(env=env)
-    env.virtualenv = u'/env/{env.repo}/{env.instance}'.format(env=env)
+    env.virtualenv = env.virtualenv_template.format(env=env)
     env.activate = u'source {env.virtualenv}/bin/activate'.format(env=env)
     env.source_vars = u'source {env.virtualenv}/bin/vars'.format(env=env)
     env.uwsgi_ini = u'{env.directory}/uwsgi.ini'.format(env=env)
+    if env.memcached:
+        env.memcached_sock = '{env.directory}/memcached.sock'.format(env=env)
 
     if env.instance == 'live':
         env.settings_variant = 'production'
@@ -87,6 +95,10 @@ def generate_envvars():
         'DJANGO_DB_PASSWORD': env.secrets['db'],
         'DJANGO_SECRET_KEY': env.secrets['key'],
     }
+
+    if hasattr(env, 'memcached'):
+        variables['DJANGO_MC_SOCKET'] = env.memcached_sock
+
     env.envvars = variables
     
 
@@ -157,7 +169,7 @@ def setup_database():
 
 
 def initialise(instance):
-    _init(instance)
+    init(instance)
     if not confirm(red('Initialising a site will CHANGE THE DATABASE PASSWORD/SECRET KEY. Are you SURE you wish to continue?'), default=False):
         exit()
 
@@ -170,7 +182,7 @@ def initialise(instance):
     generate_envvars()
     create_var_file()
     
-    if not exists(env.activate):
+    if not exists(u'{env.virtualenv}/bin/vars'.format(env=env)):
         run(u'virtualenv {env.virtualenv}'.format(env=env))
         with virtualenv():
             run('pip install \'distribute>=0.6.35\'')
@@ -219,7 +231,13 @@ def initialise(instance):
             'type': 'uwsgi',
             'application': 'django',
             'app': env.app,
-            'env': env.envvars
+            'env': env.envvars,
+            'virtualenv': env.virtualenv,
+            'instance': env.instance,
+            'celery': env.celery,
+            'memcached': env.memcached,
+            'uwsgi_socket': '127.0.0.1:3031',
+            'fastrouter': True,
         })
         conf_uwsgi()
         
@@ -229,7 +247,7 @@ def initialise(instance):
     
 
 def upgrade(instance):
-    _init(instance)
+    init(instance)
 
     print(u'Updating {instance}'.format(instance=instance)) 
 
@@ -249,7 +267,7 @@ def upgrade(instance):
         restart()
 
 def shell(instance, *args, **kwargs):
-    _init(instance)
+    init(instance)
     manage('shell_plus')
 
 
@@ -285,9 +303,12 @@ def conf_uwsgi():
 
 def celery(instance=None):
     instance = instance or 'local'
-    _init(instance)
+    init(instance)
     if instance == 'local':
         loglevel = '--loglevel=INFO'
     else:
         loglevel = ''
-    local('DJANGO_SETTINGS_MODULE={env.app}.settings.celery_{env.settings_variant} python manage.py celery worker -B {loglevel}'.format(env=env, loglevel=loglevel))
+    celery_cmd = 'DJANGO_SETTINGS_MODULE={env.app}.settings.celery_{env.settings_variant} {env.virtualenv}/bin/python manage.py celery worker -B {loglevel}'.format(env=env, loglevel=loglevel)
+    if hasattr(env, 'celery_workers'):
+        celery_cmd += ' -c {env.celery_workers}'.format(env=env)
+    local(celery_cmd)

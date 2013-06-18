@@ -7,7 +7,7 @@ requires = []
 dep_links = []
 
 for dep in open('requirements.txt').read().split("\n"):
-    if dep.startswith('git+'):
+    if dep.startswith('git+') or dep.startswith('-e'):
         dep_links.append(dep)
     else:
         requires.append(dep)
@@ -15,7 +15,7 @@ for dep in open('requirements.txt').read().split("\n"):
 
 setup(
     name="devops",
-    version="0.1.5",
+    version="0.1.6",
     description="Fabric deployment script.",
     author=u"James Cleveland",
     author_email="james@dapperdogstudios.com",
