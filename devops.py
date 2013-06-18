@@ -225,6 +225,7 @@ def initialise(instance):
             'app': env.app,
             'env': env.envvars,
             'virtualenv': env.virtualenv,
+            'instance': env.instance,
         })
         conf_uwsgi()
         
