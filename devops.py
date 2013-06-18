@@ -24,7 +24,7 @@ env.db_adapter = 'postgresql'
 env.db_user = os.environ.get('DB_USER') or 'root'
 env.db_password = os.environ.get('DB_PASSWORD')
 env.db_host = os.environ.get('DB_HOST') or 'localhost'
-env.virtualenv_template = u'/srv/{env.repo}/{env.instance}/.virtualenvs/{env.repo}_{env.instance}/'
+env.virtualenv_template = u'/srv/{env.repo}/{env.instance}/.virtualenvs/{env.repo}_{env.instance}'
 CWD = sys.path[0]
 
 
