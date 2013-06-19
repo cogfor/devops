@@ -14,8 +14,8 @@ for dep in open('requirements.txt').read().split("\n"):
 
 
 setup(
-    name="devops",
-    version="0.1.6",
+    name="dapper-devops",
+    version="0.1.7",
     description="Fabric deployment script.",
     author=u"James Cleveland",
     author_email="james@dapperdogstudios.com",
