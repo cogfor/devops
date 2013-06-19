@@ -31,9 +31,12 @@ env.celery = False
 
 
 def debug():
-    local('python manage.py runserver {host}:{port}'.format(
+    settings_module = os.environ.get('DJANGO_SETTINGS_MODULE',
+        '{env.app}.settings.local'.format(env=env))
+    local('DJANGO_SETTINGS_MODULE={settings_module} python manage.py runserver {host}:{port}'.format(
         host=os.environ.get('DJANGO_DEBUG_HOST', '0.0.0.0'),
-        port=os.environ.get('DJANGO_DEBUG_PORT', env.debug_port)
+        port=os.environ.get('DJANGO_DEBUG_PORT', env.debug_port),
+        settings_module=settings_module,
     ))
 
 
