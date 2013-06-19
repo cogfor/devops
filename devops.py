@@ -108,11 +108,15 @@ def generate_envvars():
 
 def install_requirements():
     with virtualenv():
-        if exists('requirements.{env.instance}.txt'):
-            run('pip install -r requirements.{env.instance}.txt'.format(
+        print ('{env.directory}/requirements.txt'.format(
+            env=env))
+        if exists('{env.directory}/requirements.{env.instance}.txt'.format(
+                env=env)):
+            run('pip install -r {env.directory}/requirements.{env.instance}.txt'.format(
                 env=env))
-        elif exists('requirements.txt'):
-            run('pip install -r requirements.txt'.format(
+        elif exists('{env.directory}/requirements.txt'.format(
+                env=env)):
+            run('pip install -r {env.directory}/requirements.txt'.format(
                 env=env))
         else:
             puts(red('Requirements file not found.'))
@@ -185,16 +189,20 @@ def initialise(instance):
     generate_envvars()
     create_var_file()
     
-    if not exists(u'{env.virtualenv}/bin/vars'.format(env=env)):
+    if not exists(u'{env.virtualenv}/bin/python'.format(env=env)):
         run(u'virtualenv {env.virtualenv}'.format(env=env))
+        run(u'echo "source {env.virtualenv}/bin/vars" >> {env.virtualenv}/bin/activate'.format(env=env))
         with virtualenv():
-            run('pip install \'distribute>=0.6.35\'')
+            run('pip install -U pip distribute')
     with cd(env.directory):
         with settings(warn_only=True):
-            result = run(u'git clone git@codebasehq.com:linkscreative/{env.project}/{env.repo}.git .'.format(
-                env=env
-            ))
-            if result.failed:
+            if not exists(u'{env.directory}/.git'.format(env=env)):
+                run(u'git clone git@codebasehq.com:linkscreative/{env.project}/{env.repo}.git .clone'.format(
+                    env=env
+                ))
+                run(u'rsync -avz .clone/ {env.directory}/'.format(env=env))
+                run(u'rm -rf .clone')
+            else:
                 run('git pull --rebase')
 
     install_requirements()
