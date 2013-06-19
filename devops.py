@@ -29,6 +29,8 @@ CWD = sys.path[0]
 env.memcached = False
 env.celery = False
 
+env.uwsgi_socket = '127.0.0.1:3031'
+
 
 def debug():
     settings_module = os.environ.get('DJANGO_SETTINGS_MODULE',
@@ -220,6 +222,7 @@ def initialise(instance):
         from django.conf import settings as djsettings
         nginx_config['media_url'] = djsettings.MEDIA_URL
         nginx_config['static_url'] = djsettings.STATIC_URL
+        nginx_config['uwsgi_socket'] = env.uwsgi_socket
 
     env.site = {
         'instances': [
@@ -232,6 +235,7 @@ def initialise(instance):
             nginx_config,
         ],
     }
+    
     conf_nginx()
     if env.application == 'django':
         with warn_only():
@@ -247,7 +251,7 @@ def initialise(instance):
             'instance': env.instance,
             'celery': env.celery,
             'memcached': env.memcached,
-            'uwsgi_socket': '127.0.0.1:3031',
+            'uwsgi_socket': env.uwsgi_socket,
             'fastrouter': True,
         })
         conf_uwsgi()
