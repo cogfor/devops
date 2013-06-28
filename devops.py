@@ -29,6 +29,7 @@ CWD = sys.path[0]
 env.memcached = False
 env.celery = False
 
+env.uwsgi_secure = False
 env.uwsgi_socket = '127.0.0.1:3031'
 
 
@@ -253,6 +254,7 @@ def initialise(instance):
             'memcached': env.memcached,
             'uwsgi_socket': env.uwsgi_socket,
             'fastrouter': True,
+            'secure': env.uwsgi_secure,
         })
         conf_uwsgi()
         
