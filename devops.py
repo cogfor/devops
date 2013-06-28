@@ -29,6 +29,9 @@ CWD = sys.path[0]
 env.memcached = False
 env.celery = False
 
+env.nginx_parent = 'base'
+
+env.uwsgi_parent = 'base'
 env.uwsgi_secure = False
 env.uwsgi_socket = '127.0.0.1:3031'
 
@@ -220,6 +223,7 @@ def initialise(instance):
     nginx_config = {
         'type': 'nginx',
         'application': env.application,
+        'parent': env.nginx_parent,
     }
     if env.application == 'django':
         from django.conf import settings as djsettings
@@ -248,6 +252,7 @@ def initialise(instance):
         env.site['configs'].append({
             'type': 'uwsgi',
             'application': 'django',
+            'parent': env.uwsgi_parent,
             'app': env.app,
             'env': env.envvars,
             'virtualenv': env.virtualenv,
