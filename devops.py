@@ -101,6 +101,8 @@ def generate_envvars():
         'DJANGO_DB_PASSWORD': env.secrets['db'],
         'DJANGO_SECRET_KEY': env.secrets['key'],
     }
+    for k, v in variables.items():
+        os.environ[k] = v
 
     if hasattr(env, 'memcached'):
         variables['DJANGO_MC_SOCKET'] = env.memcached_sock
