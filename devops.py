@@ -30,6 +30,7 @@ env.memcached = False
 env.celery = False
 
 env.nginx_parent = 'base'
+env.nginx_default = 'off'
 
 env.uwsgi_parent = 'base'
 env.uwsgi_secure = False
@@ -224,6 +225,7 @@ def initialise(instance):
         'type': 'nginx',
         'application': env.application,
         'parent': env.nginx_parent,
+        'default': env.nginx_default,
     }
     if env.application == 'django':
         from django.conf import settings as djsettings
