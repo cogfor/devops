@@ -226,6 +226,7 @@ def initialise(instance):
         'application': env.application,
         'parent': env.nginx_parent,
         'default': env.nginx_default,
+        'ip': getattr(env, 'listen_ip', None),
     }
     if env.application == 'django':
         from django.conf import settings as djsettings
@@ -264,7 +265,6 @@ def initialise(instance):
             'uwsgi_socket': env.uwsgi_socket,
             'fastrouter': True,
             'secure': env.uwsgi_secure,
-            'ip': getattr(env, 'listen_ip', None),
         })
         conf_uwsgi()
         
