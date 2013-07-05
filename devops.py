@@ -264,6 +264,7 @@ def initialise(instance):
             'uwsgi_socket': env.uwsgi_socket,
             'fastrouter': True,
             'secure': env.uwsgi_secure,
+            'ip': getattr(env, 'listen_ip', None),
         })
         conf_uwsgi()
         
