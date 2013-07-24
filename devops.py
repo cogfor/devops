@@ -37,13 +37,14 @@ env.uwsgi_secure = False
 env.uwsgi_socket = '127.0.0.1:3031'
 
 
-def debug():
+def debug(command='runserver'):
     settings_module = os.environ.get('DJANGO_SETTINGS_MODULE',
         '{env.app}.settings.local'.format(env=env))
-    local('DJANGO_SETTINGS_MODULE={settings_module} python manage.py runserver {host}:{port}'.format(
+    local('DJANGO_SETTINGS_MODULE={settings_module} python manage.py {command} {host}:{port}'.format(
         host=os.environ.get('DJANGO_DEBUG_HOST', '0.0.0.0'),
         port=os.environ.get('DJANGO_DEBUG_PORT', env.debug_port),
         settings_module=settings_module,
+        command=command,
     ))
 
 
