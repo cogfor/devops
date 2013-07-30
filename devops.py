@@ -109,7 +109,7 @@ def generate_envvars():
     for k, v in variables.items():
         os.environ[k] = v
 
-    if hasattr(env, 'memcached'):
+    if getattr(env, 'memcached'):
         variables['DJANGO_MC_SOCKET'] = env.memcached_sock
 
     env.envvars = variables
