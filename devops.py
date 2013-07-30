@@ -30,7 +30,7 @@ env.memcached = False
 env.celery = False
 
 env.nginx_parent = 'base'
-env.nginx_default = 'off'
+env.nginx_default = False
 
 env.uwsgi_parent = 'base'
 env.uwsgi_secure = False
