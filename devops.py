@@ -20,8 +20,6 @@ from fabric.decorators import with_settings
 
 
 env.hosts = []
-env.media_url = '/media'
-env.static_url = '/static'
 env.db_adapter = 'postgresql'
 env.db_user = os.environ.get('DB_USER') or 'root'
 env.db_password = os.environ.get('DB_PASSWORD')
@@ -232,8 +230,9 @@ def initialise(instance):
         'ip': getattr(env, 'listen_ip', None),
     }
     if env.application == 'django':
-        nginx_config['media_url'] = env.media_url
-        nginx_config['static_url'] = env.static_url            
+        from django.conf import settings as djsettings
+        nginx_config['media_url'] = djsettings.MEDIA_URL
+        nginx_config['static_url'] = djsettings.STATIC_URL
         nginx_config['uwsgi_socket'] = env.uwsgi_socket
 
     env.site = {
