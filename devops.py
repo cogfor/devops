@@ -230,9 +230,8 @@ def initialise(instance):
         'ip': getattr(env, 'listen_ip', None),
     }
     if env.application == 'django':
-        from django.conf import settings as djsettings
-        nginx_config['media_url'] = djsettings.MEDIA_URL
-        nginx_config['static_url'] = djsettings.STATIC_URL
+        nginx_config['media_url'] = '/media'
+        nginx_config['static_url'] = '/static'            
         nginx_config['uwsgi_socket'] = env.uwsgi_socket
 
     env.site = {
