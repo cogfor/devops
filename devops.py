@@ -43,7 +43,7 @@ def debug(command='runserver'):
     local('DJANGO_SETTINGS_MODULE={settings_module} DJANGO_INSTANCE={instance} python manage.py {command} {host}:{port}'.format(
         host=os.environ.get('DJANGO_DEBUG_HOST', '0.0.0.0'),
         port=os.environ.get('DJANGO_DEBUG_PORT', env.debug_port),
-        instance=os.environ.get('DJANGO_DEBUG_HOST', '0.0.0.0'),
+        instance=os.environ.get('DJANGO_INSTANCE', 'local'),
         settings_module=settings_module,
         command=command,
     ))
