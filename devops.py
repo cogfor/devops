@@ -29,14 +29,23 @@ CWD = sys.path[0]
 env.memcached = False
 env.celery = False
 
+env.nginx_parent = 'base'
+env.nginx_default = False
 
-def debug():
+env.uwsgi_parent = 'base'
+env.uwsgi_secure = False
+env.uwsgi_socket = '127.0.0.1:3031'
+
+
+def debug(command='runserver'):
     settings_module = os.environ.get('DJANGO_SETTINGS_MODULE',
         '{env.app}.settings.local'.format(env=env))
-    local('DJANGO_SETTINGS_MODULE={settings_module} python manage.py runserver {host}:{port}'.format(
+    local('DJANGO_SETTINGS_MODULE={settings_module} DJANGO_INSTANCE={instance} python manage.py {command} {host}:{port}'.format(
         host=os.environ.get('DJANGO_DEBUG_HOST', '0.0.0.0'),
         port=os.environ.get('DJANGO_DEBUG_PORT', env.debug_port),
+        instance=os.environ.get('DJANGO_INSTANCE', 'local'),
         settings_module=settings_module,
+        command=command,
     ))
 
 
@@ -98,8 +107,10 @@ def generate_envvars():
         'DJANGO_DB_PASSWORD': env.secrets['db'],
         'DJANGO_SECRET_KEY': env.secrets['key'],
     }
+    for k, v in variables.items():
+        os.environ[k] = v
 
-    if hasattr(env, 'memcached'):
+    if getattr(env, 'memcached'):
         variables['DJANGO_MC_SOCKET'] = env.memcached_sock
 
     env.envvars = variables
@@ -215,11 +226,15 @@ def initialise(instance):
     nginx_config = {
         'type': 'nginx',
         'application': env.application,
+        'parent': env.nginx_parent,
+        'default': env.nginx_default,
+        'ip': getattr(env, 'listen_ip', None),
     }
     if env.application == 'django':
         from django.conf import settings as djsettings
         nginx_config['media_url'] = djsettings.MEDIA_URL
         nginx_config['static_url'] = djsettings.STATIC_URL
+        nginx_config['uwsgi_socket'] = env.uwsgi_socket
 
     env.site = {
         'instances': [
@@ -232,6 +247,7 @@ def initialise(instance):
             nginx_config,
         ],
     }
+    
     conf_nginx()
     if env.application == 'django':
         with warn_only():
@@ -241,14 +257,16 @@ def initialise(instance):
         env.site['configs'].append({
             'type': 'uwsgi',
             'application': 'django',
+            'parent': env.uwsgi_parent,
             'app': env.app,
             'env': env.envvars,
             'virtualenv': env.virtualenv,
             'instance': env.instance,
             'celery': env.celery,
             'memcached': env.memcached,
-            'uwsgi_socket': '127.0.0.1:3031',
+            'uwsgi_socket': env.uwsgi_socket,
             'fastrouter': True,
+            'secure': env.uwsgi_secure,
         })
         conf_uwsgi()
         
