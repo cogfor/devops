@@ -81,7 +81,7 @@ def init(instance):
     env.directory = u'/srv/{env.repo}/{env.instance}'.format(env=env)
     env.virtualenv = env.virtualenv_template.format(env=env)
     env.activate = u'source {env.virtualenv}/bin/activate'.format(env=env)
-    env.source_vars = u'source {env.virtualenv}/bin/vars'.format(env=env)
+    env.source_vars = u'source {env.virtualenv}/bin/postactivate'.format(env=env)
     env.uwsgi_ini = u'{env.directory}/uwsgi.ini'.format(env=env)
     if env.memcached:
         env.memcached_sock = '{env.directory}/memcached.sock'.format(env=env)
@@ -162,9 +162,10 @@ def manage(command):
 
 def create_var_file():
     with cd(env.virtualenv):
-        run('echo > bin/vars')
+        run('echo "#!/bin/bash"> bin/postactivate')
+        run('chmod +x bin/postactivate')
         for k, v in env.envvars.items():
-            run('echo "export {0}={1}" >> bin/vars'.format(k, pipes.quote(v)))
+            run('echo "export {0}={1}" >> bin/postactivate'.format(k, pipes.quote(v)))
 
 
 def setup_database_mysql():
