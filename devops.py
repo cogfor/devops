@@ -21,9 +21,11 @@ from fabric.decorators import with_settings
 
 env.hosts = []
 env.db_adapter = 'postgresql'
-env.db_user = os.environ.get('DB_USER') or 'root'
-env.db_password = os.environ.get('DB_PASSWORD')
 env.db_host = os.environ.get('DB_HOST') or 'localhost'
+
+env.db_master_user = os.environ.get('DB_USER') or 'root'
+env.db_master_password = os.environ.get('DB_PASSWORD')
+
 env.virtualenv_template = u'/srv/{env.repo}/{env.instance}/.virtualenvs/{env.repo}_{env.instance}'
 CWD = sys.path[0]
 env.memcached = False
@@ -70,6 +72,15 @@ def init(instance):
     else:
         env.user = env.user_override
 
+    env.db_port = getattr(env, 'db_port', None)
+    if not env.db_port:
+        if env.db_adapter == 'postgres':
+            env.db_port = 5432
+        elif env.db_adapter == 'mysql':
+            env.db_port = 3306
+        else:
+            env.db_port = None
+
     if not env.repo:
         raise Exception('REPO not defined.')
     if not env.app:
@@ -106,6 +117,7 @@ def get_database_url():
         user=env.user,
         password=env.secrets['db'],
         host=env.db_host,
+        port=env.db_port,
         name=env.user,
     )
 
@@ -144,14 +156,14 @@ def install_requirements():
 
 @with_settings(warn_only=True)
 def run_mysql(command):
-    if not env.db_user:
+    if not env.db_master_user:
         raise Exception('Control DB user not set!')
-    if not env.db_password:
+    if not env.db_master_password:
         raise Exception('Control DB password not set!')
     if not env.db_host:
         raise Exception('Control DB host not set!')
 
-    run('echo "{command}" | mysql -u {env.db_user} -p{env.db_password} '.format(env=env,
+    run('echo "{command}" | mysql -u {env.db_master_user} -p{env.db_master_password} '.format(env=env,
         command=command
     ))
 
