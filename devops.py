@@ -277,7 +277,6 @@ def initialise(instance):
             'uwsgi_socket': env.uwsgi_socket,
             'fastrouter': True,
             'secure': env.uwsgi_secure,
-            'database_url': get_database_url(),
         })
         conf_uwsgi()
         
