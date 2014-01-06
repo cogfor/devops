@@ -253,7 +253,7 @@ def initialise(instance):
         'ip': getattr(env, 'listen_ip', None),
     }
     if env.application == 'django':
-        os.environ['SKIP_BROKER'] = True
+        os.environ['SKIP_BROKER'] = 'y'
         from django.conf import settings as djsettings
         nginx_config['media_url'] = djsettings.MEDIA_URL
         nginx_config['static_url'] = djsettings.STATIC_URL
