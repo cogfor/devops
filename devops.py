@@ -100,12 +100,21 @@ def init(instance):
         django.settings_module('{env.app}.settings.{env.settings_variant}'.format(
             env=env))
 
+def get_database_url():
+    return '{engine}://{user}:{password}@{host}:{port}/{name}'.format(
+        engine=env.db_adapter,
+        user=env.user,
+        password=env.secrets['db'],
+        host=env.db_host,
+        name=env.user,
+    )
 
 def generate_envvars():
     variables = {
         'DJANGO_SETTINGS_MODULE': u'{env.app}.settings.{env.settings_variant}'.format(env=env),
         'DJANGO_DB_PASSWORD': env.secrets['db'],
         'DJANGO_SECRET_KEY': env.secrets['key'],
+        'DATABASE_URL': get_database_url(),
     }
     for k, v in variables.items():
         os.environ[k] = v
@@ -268,6 +277,7 @@ def initialise(instance):
             'uwsgi_socket': env.uwsgi_socket,
             'fastrouter': True,
             'secure': env.uwsgi_secure,
+            'database_url': get_database_url(),
         })
         conf_uwsgi()
         
