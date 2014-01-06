@@ -127,6 +127,7 @@ def generate_envvars():
         'DJANGO_DB_PASSWORD': env.secrets['db'],
         'DJANGO_SECRET_KEY': env.secrets['key'],
         'DATABASE_URL': get_database_url(),
+        'DJANGO_INSTANCE': env.instance,
     }
     for k, v in variables.items():
         os.environ[k] = v
