@@ -52,7 +52,7 @@ def debug(command='runserver'):
 
 
 def _random(length=16):
-    return ''.join([random.choice(string.digits + string.letters + u'!-_:;.,^&')
+    return ''.join([random.choice(string.digits + string.letters + u'!-_^')
                     for i
                     in range(0, length)])
 
