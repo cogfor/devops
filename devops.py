@@ -225,7 +225,6 @@ def initialise(instance):
     
     if not exists(u'{env.virtualenv}/bin/python'.format(env=env)):
         run(u'virtualenv {env.virtualenv}'.format(env=env))
-        run(u'echo "source {env.virtualenv}/bin/vars" >> {env.virtualenv}/bin/activate'.format(env=env))
         with virtualenv():
             run('pip install -U pip distribute')
     with cd(env.directory):
@@ -254,6 +253,7 @@ def initialise(instance):
         'ip': getattr(env, 'listen_ip', None),
     }
     if env.application == 'django':
+        os.environ['SKIP_BROKER'] = True
         from django.conf import settings as djsettings
         nginx_config['media_url'] = djsettings.MEDIA_URL
         nginx_config['static_url'] = djsettings.STATIC_URL
