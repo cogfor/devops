@@ -357,10 +357,22 @@ def celery(instance=None):
     instance = instance or 'local'
     init(instance)
     if instance == 'local':
-        loglevel = '--loglevel=INFO'
+        loglevel = u'--loglevel=INFO'
     else:
-        loglevel = ''
-    celery_cmd = 'DJANGO_SETTINGS_MODULE={env.app}.settings.{env.settings_variant} {env.virtualenv}/bin/celery worker --app={env.app} -B {loglevel}'.format(env=env, loglevel=loglevel)
+        loglevel = None
+    celery_cmd = [
+        u'DJANGO_SETTINGS_MODULE={env.app}.settings.{env.settings_variant}'.format(env=env),
+        u'{env.virtualenv}/bin/celery'.format(env=env),
+        u'worker',
+        u'--app={env.app}'.format(env=env),
+        u'--beat',
+    ]
     if hasattr(env, 'celery_workers'):
-        celery_cmd += ' -c {env.celery_workers}'.format(env=env)
-    local(celery_cmd)
+        celery_cmd.append(
+            '--concurrency={env.celery_workers}'.format(env=env)
+        )
+    if loglevel:
+        celery_cmd.append(
+            loglevel
+        )
+    local(u' '.join(celery_cmd))
