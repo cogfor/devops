@@ -371,6 +371,10 @@ def celery(instance=None):
         celery_cmd.append(
             '--concurrency={env.celery_workers}'.format(env=env)
         )
+    else:
+        celery_cmd.append(
+            '--autoscale=10,1'
+        )
     if loglevel:
         celery_cmd.append(
             loglevel
