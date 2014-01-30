@@ -7,3 +7,4 @@ env.app = env.repo
 env.domains = ['test.cogfor.com']
 env.hosts = env.domains
 env.application = 'django'
+env.user_override = 'root'
