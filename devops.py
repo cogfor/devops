@@ -36,6 +36,12 @@ env.uwsgi_parent = 'base'
 env.uwsgi_secure = False
 env.uwsgi_socket = '127.0.0.1:3031'
 
+def hello(name="world"):
+    print("Hello %s!" % name)
+    code_dir = '/srv/cog4'
+    #with cd(code_dir):
+    run("whoami")
+    	#run("touch test")
 
 def debug(command='runserver'):
     settings_module = os.environ.get('DJANGO_SETTINGS_MODULE',
@@ -208,7 +214,7 @@ def initialise(instance):
     with cd(env.directory):
         with settings(warn_only=True):
             if not exists(u'{env.directory}/.git'.format(env=env)):
-                run(u'git clone git@codebasehq.com:linkscreative/{env.project}/{env.repo}.git .clone'.format(
+                run(u'git clone git@github.com:{env.project}.git .clone'.format(
                     env=env
                 ))
                 run(u'rsync -avz .clone/ {env.directory}/'.format(env=env))

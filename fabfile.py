@@ -1,7 +1,9 @@
 from fabric.api import env
-from devops import initialise, upgrade
+from devops import initialise, upgrade, hello
 
-env.repo = 'devops'
-env.project = 'links-creative'
+env.repo = 'cog4'
+env.project = 'cogfor/cog4'
 env.app = env.repo
-env.domains = ['derp.linkscreative.co.uk']
+env.domains = ['test.cogfor.com']
+env.hosts = env.domains
+env.application = 'django'
